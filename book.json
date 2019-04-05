@@ -3,5 +3,13 @@
     "title": "个人文章杂记",
     "author": "Seven",
     "description": "个人平时简单的笔记记录，较为杂乱",
-    "language": "zh-hans"
+    "language": "zh-hans",
+    "plugins": ["toggle-chapters", "page-toc"],
+    "pluginsConfig": {
+        "page-toc": {
+            "selector": ".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4",
+            "position": "top",
+            "showByDefault": true
+        }
+    }
 }

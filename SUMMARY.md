@@ -9,7 +9,9 @@
     * [2.2 实现LRU缓存](java/LRUCache.md)
 
 * [3. Netty学习笔记](netty/README.md)
-    * [3.1 ByteBuf详解](netty/bytebuf.md)    
+    * [3.1 ByteBuf详解](netty/bytebuf.md) 
+    * [3.2 CompositeByteBuf 详解](netty/CompositeByteBuf详解.md)  
+    * [3.3 Netty 引用计数的自旋锁](netty/Netty引用计数的自旋锁.md) 
 
 
 * [4. Emacs基础入门教程](emacs/README.md)

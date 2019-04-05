@@ -9,7 +9,7 @@ Java的NIO模块提供了ByteBuffer作为其字节存储容器，但是这个类
 
 下面我们将深入学习Netty的核心之一的ByteBuf的内部。
 
-## 读索引和写索引
+## 1. 读索引和写索引
 ByteByf内部有三个主要的标记分别是readInde、writeIndex以及capacity，分别用来标记度索引,写索引，以及容器容量.其基本数据结果如下图所示：
 
 ![ByteBuf的索引维护结构](./images/ByteBuf的索引结构.png)
@@ -24,14 +24,18 @@ ByteByf内部有三个主要的标记分别是readInde、writeIndex以及capacit
 如果readIndex > write 或者 write > capacity 的时候将会抛出IndexOutOfBoundException
 
 
-## 缓存区类型
+## 2. 缓存区类型
 
 ByteBuf实现的类型主要有三种：
 1. 堆缓冲区
 2. 直接缓冲区(非堆缓冲)
 3. 复合缓冲区
 
-### 堆缓冲区
+堆内存缓冲区由JVM进行管理，因此创建和释放非常的方便，但是在进行数据交互的时候，需要从JVM内存中拷贝到操作系统直接内存中，性能略低。同样的对于直接缓冲器而言，其读写数据非常方便，不需要再次拷贝数据，但是JVM对其管理(创建和释放)相对于JVM堆内存而言，都不是太容易。
+
+所以综合而言，针对后端的数据处理业务，则推荐使用HeapByteBuf，对IO线程交互等操作，推荐使用DirectByteBuf.
+
+### 2.1 堆缓冲区
 堆缓冲区是ByteBuf最常见的实现模式，其实将数据存储在JVM的堆内存中，内部实现是array数据，所以这种模式也成为`数组支撑`，可以通过`hasArray()` 方法判断其内部实现是否是数组支撑，如果是的话，我们可以安全的使用`arrayOffset()`方法来获取偏移量结合readableBytes()来获取其底层实现，即获取byte[],比如:
 
 ```java
@@ -50,7 +54,7 @@ ByteBuf实现的类型主要有三种：
 > 如果不是数组支撑实现的话，调用`arrayOffset()`方法将会抛出UnsupportOperationException.
 
 
-### 直接缓冲区
+### 2.2 直接缓冲区
 直接缓冲区是ByteBuf的另外一种实现的模式，但是其内存分配是操作系统实现的，且内存并非在堆内存上。JavaDoc的
 文档指出
 
@@ -70,10 +74,10 @@ ByteBuf实现的类型主要有三种：
     }
 ```
 
-### 复合缓冲区
+### 2.3 复合缓冲区
 复合缓冲区比较复杂，其主要是CompositeByteBuf实现，后面专门开一个文件学习这个实现模式.
 
-## 字节读写操作
+## 3 字节读写操作
 ByteBuf是一个抽象类，不能使用new关键字创建，我们可以使用Unpooled创建，如下:
 
 ```java
@@ -81,7 +85,7 @@ ByteBuf是一个抽象类，不能使用new关键字创建，我们可以使用U
     ByteBuf byteBuf = Unpooled.buffer(10);
 ```
 
-### 写操作
+### 3.1 写操作
 ByteBuf提供了多个writeByte() 重载操作，我们可以使用这个进行写数据。使用writeByte()方法写入数据会自动移动writeInde，如下:
 
 ```java
@@ -104,13 +108,13 @@ ByteBuf提供了多个writeByte() 重载操作，我们可以使用这个进行�
     System.out.println("写数据之后ByteBuf的writeIndex=" + buffer.writerIndex());
 ```
 
-> 写操作的时候，如果writeIndex > capaction 则会抛出IndexOutOfBoundException 异常
+> 写操作的时候，如果writeIndex > capaction  则会按指数扩容
 
-### 读操作
+### 3.2 读操作
 
 同样的，读操作也有两种方式: 一种是按顺序读取，另外一种是指定索引读取. 按顺序则通过`readByte()` 读取，readByte读取每次读取一个字节，同时readIndex会自动移动，按指定索引读取，则不会移动readIndex.
 
-#### 按顺序读取 
+#### 3.2.1 按顺序读取 
 ByteBuf可以通过readByte()方法读取，如果可读字节耗尽，那么将会抛出IndexOutOfBoundException异常，所以在每次readByte()的时候需要判断是否可读，示例代码如下：
 
 ```java
@@ -125,7 +129,7 @@ ByteBuf可以通过readByte()方法读取，如果可读字节耗尽，那么将
     }
 ```
 
-#### 按索引读取
+#### 3.2.2 按索引读取
 
 使用getByte(int index)可以获取数据，但是readIndex不会移动,但是要求readIndex小于writeIndex.
 
@@ -139,7 +143,7 @@ ByteBuf可以通过readByte()方法读取，如果可读字节耗尽，那么将
     }
 ```
 
-### 搜索操作
+### 3.3 搜索操作
 ByteBuf最简单的搜索方法就是`indexOf()` 方法，indexOf() 不存在的时候返回的索引为 -1 .
 
 ```java
@@ -154,7 +158,7 @@ ByteBuf最简单的搜索方法就是`indexOf()` 方法，indexOf() 不存在的
 ```
 
 
-### 索引管理
+### 3.4 索引管理
 ByteBuf 提供了mark()和reset()方法来标记和重置readIndex和writeIndex这两个索引,分别是:
 
 + markReadIndex() 
@@ -194,7 +198,7 @@ ByteBuf 提供了mark()和reset()方法来标记和重置readIndex和writeIndex�
     }
 ```
 
-### 复制操作
+### 3.5 复制操作
 
 某些场景下，我们需要复制某个ByetBuf，ByteBuf提供了两种复制机制：浅拷贝和深拷贝.
 
