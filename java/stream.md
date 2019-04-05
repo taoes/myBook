@@ -1,12 +1,14 @@
 
-> JDK 8新增了Stream处理的方式,结合函数式编程，可以很方便的解决我们以前的那又臭又长的代码，虽然说在性能上，Stream操作相比于原生的操作性能略低，但是应该是瑕不掩瑜的，下面记录着个人开发中常用的一些Stream使用案例。
+ ## 1. JDK8的Stream
+
+ JDK 8新增了Stream处理的方式,结合函数式编程，可以很方便的解决我们以前的那又臭又长的代码，虽然说在性能上，Stream操作相比于原生的操作性能略低，但是应该是瑕不掩瑜的，下面记录着个人开发中常用的一些Stream使用案例。
 
 ### 使用foreach遍历
 
 ```java
   public static void main(String[] args) {
     List<String> stringList = Arrays.asList("A", "B", "C", "D", "E", "F", "G");
-    stringList.forEach(x -> System.out.println(x));
+    stringList.forEach(x -> System.out.println(x));KT
   }
 ```
 
