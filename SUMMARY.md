@@ -12,6 +12,8 @@
     * [3.1 ByteBuf详解](netty/bytebuf.md) 
     * [3.2 CompositeByteBuf 详解](netty/CompositeByteBuf详解.md)  
     * [3.3 Netty 引用计数的自旋锁](netty/Netty引用计数的自旋锁.md) 
+    * [3.4 Netty 的自定义编解码器](netty/codec.md)
+    * [3.5 Netty 实现自定义私有协议](netty/privateProtocol.md)
 
 
 * [4. Emacs基础入门教程](emacs/README.md)
